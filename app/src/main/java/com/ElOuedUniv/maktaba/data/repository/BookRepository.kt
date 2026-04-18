@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-
 class BookRepositoryImpl @Inject constructor() : BookRepository {
 
+     // لازم تكون mutable لزيادة
     private val _booksList = mutableListOf(
         Book(isbn = "978-0-13-468599-1", title = "Clean Code", nbPages = 464),
         Book(isbn = "978-0-13-595705-9", title = "The Pragmatic Programmer", nbPages = 352),
@@ -26,23 +26,26 @@ class BookRepositoryImpl @Inject constructor() : BookRepository {
         Book(isbn = "978-995-986-045-3", title = "زَادُ المَعَادِ فِي هَدْيِ خَيْرِ العِبَادِ", nbPages = 1780)
 
     )
-
+ // Flow ارسال التحديثات
     private val booksFlow = MutableSharedFlow<List<Book>>(replay = 1).apply {
         tryEmit(_booksList.toList())
     }
 
     override fun getAllBooks(): Flow<List<Book>> = flow {
         
-        delay(1000) // Simulate network
+        delay(2000) // simulate loading
         emitAll(booksFlow)
     }
 
     }
 
     override fun addBook(book: Book) {
-       
+        // اضافة كتاب
+        _booksList.add(book)
 
-            _booksList.add(book)
-            booksFlow.tryEmit(_booksList.toList())
+        // ارسال قائمة جديدة
+        booksFlow.tryEmit(_booksList.toList())
+
+          
     }
 }
